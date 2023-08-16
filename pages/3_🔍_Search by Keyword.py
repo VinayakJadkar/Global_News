@@ -1,14 +1,9 @@
 import json
 import requests
 import streamlit as st
-import os
-
-from dotenv import load_dotenv
-
-load_dotenv()
 
 # Define your NewsAPI.org API key
-api_key = os.getenv("API")
+api_key = "pub_27492aab2f2ae3b24de7a73a5c1d952d82ace"
 
 
 
