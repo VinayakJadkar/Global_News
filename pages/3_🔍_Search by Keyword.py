@@ -2,7 +2,6 @@ import json
 import requests
 import streamlit as st
 
-
 # Define your NewsAPI.org API key
 api_key = "pub_27492aab2f2ae3b24de7a73a5c1d952d82ace"
 
@@ -54,10 +53,27 @@ country_dict = {
 }
   
 
+lang_dict = {
+    "Afrikaans": "af", "Albanian": "sq", "Amharic": "am", "Arabic": "ar", "Assamese": "as",
+    "Azerbaijani": "az", "Belarusian": "be", "Bengali": "bn", "Bosnian": "bs", "Bulgarian": "bg",
+    "Burmese": "my", "Catalan": "ca", "Central Kurdish": "ckb", "Chinese": "zh", "Croatian": "hr",
+    "Czech": "cs", "Danish": "da", "Dutch": "nl", "English": "en", "Estonian": "et", "Filipino": "pi",
+    "Finnish": "fi", "French": "fr", "Georgian": "ka", "German": "de", "Greek": "el", "Gujarati": "gu",
+    "Hebrew": "he", "Hindi": "hi", "Hungarian": "hu", "Icelandic": "is", "Indonesian": "id", "Italian": "it",
+    "Japanese": "jp", "Khmer": "kh", "Kinyarwanda": "rw", "Korean": "ko", "Latvian": "lv", "Lithuanian": "lt",
+    "Luxembourgish": "lb", "Macedonian": "mk", "Malay": "ms", "Malayalam": "ml", "Maltese": "mt",
+    "Maori": "mi", "Marathi": "mr", "Mongolian": "mn", "Nepali": "ne", "Norwegian": "no", "Oriya": "or",
+    "Pashto": "ps", "Persian": "fa", "Polish": "pl", "Portuguese": "pt", "Punjabi": "pa", "Romanian": "ro",
+    "Russian": "ru", "Samoan": "sm", "Serbian": "sr", "Shona": "sn", "Sinhala": "si", "Slovak": "sk",
+    "Slovenian": "sl", "Somali": "so", "Spanish": "es", "Swahili": "sw", "Swedish": "sv", "Tajik": "tg",
+    "Tamil": "ta", "Telugu": "te", "Thai": "th", "Turkish": "tr", "Turkmen": "tk", "Ukrainian": "uk",
+    "Urdu": "ur", "Uzbek": "uz", "Vietnamese": "vi"
+}
 
 
 # Sidebar for selecting filters
 keyword=st.sidebar.text_input("Search_keyword")
+selected_language = st.sidebar.selectbox("Language", list(lang_dict.keys()))  # Add language selection
 selected_country_code = st.sidebar.selectbox("Country", list(country_dict.keys()))
 fetch_result = st.sidebar.button("Show Results")
 
@@ -65,8 +81,8 @@ fetch_result = st.sidebar.button("Show Results")
 
 # Function to fetch news data from the API with caching
 @st.cache_data(ttl=3600)  # Cache for 1 hour
-def fetch_news_data_cached(keyword, country):
-    url = f"https://newsdata.io/api/1/news?apikey={api_key}&language=en&q={keyword}&country={country}"
+def fetch_news_data_cached(keyword, country,language):
+    url = f"https://newsdata.io/api/1/news?apikey={api_key}&language={language}&q={keyword}&country={country}"
     response = requests.get(url)
     news_data = response.json()
     return news_data
@@ -85,7 +101,8 @@ def render_full_article_page(title, description, content, link):
 # Fetch and display news data if the Fetch Result button is clicked
 if fetch_result:
     selected_country = country_dict[selected_country_code]
-    news_data = fetch_news_data_cached(keyword, selected_country)
+    selected_language_code = lang_dict[selected_language]  # Get selected language code
+    news_data = fetch_news_data_cached(keyword, selected_country, selected_language_code)
 
     # Create dynamic containers using the fetched news data
     for idx, results in enumerate(news_data["results"]):
